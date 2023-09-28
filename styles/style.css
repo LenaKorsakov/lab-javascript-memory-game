@@ -88,3 +88,13 @@ p {
   font-size: 20px;
   text-align: center;
 }
+
+dialog::backdrop {
+  backdrop-filter: blur(4px) sepia(0.5) brightness(0.5);
+}
+
+dialog {
+  width: 500px;
+  background-color: #456783;
+  border: none;
+}
