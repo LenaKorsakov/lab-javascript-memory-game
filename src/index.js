@@ -32,6 +32,7 @@ const memoryGame = new MemoryGame(cards);
 const pairsClicked = document.querySelector('#pairs-clicked');
 const pairsGuessed = document.querySelector('#pairs-guessed');
 const endGameScreen = document.querySelector('.end-game-screen');
+let canPlay = true;
 
 window.addEventListener('load', (event) => {
   memoryGame.shuffleCards();
@@ -50,22 +51,25 @@ window.addEventListener('load', (event) => {
 
   // Bind the click event of each element to a function
   document.querySelectorAll('.card').forEach((card) => {
-    card.addEventListener('click', flipCard);
+    card.addEventListener('click', handleCardClick);
   });
 });
 
-function flipCard() {
-  if (!memoryGame.isTwoCardsPicked()) {
+function handleCardClick() {
+  if (canPlay) {
     this.classList.add('turned');
-    memoryGame.addToPicked(this);
-  }
+    if (!memoryGame.isTwoCardsPicked()) {
+      memoryGame.addToPicked(this);
+    }
 
-  if (memoryGame.isTwoCardsPicked()) {
-    const [firstCard, secondCard] = memoryGame.pickedCards;
-    checkForMatch(firstCard, secondCard);
-    pairsGuessed.textContent = memoryGame.pairsGuessed;
+    if (memoryGame.isTwoCardsPicked()) {
+      canPlay = false;
+      const [firstCard, secondCard] = memoryGame.pickedCards;
+      checkForMatch(firstCard, secondCard);
+      pairsGuessed.textContent = memoryGame.pairsGuessed;
+    }
+    pairsClicked.textContent = memoryGame.pairsClicked;
   }
-  pairsClicked.textContent = memoryGame.pairsClicked;
 }
 
 function checkForMatch(firstCard, secondCard) {
@@ -77,6 +81,7 @@ function checkForMatch(firstCard, secondCard) {
   if (isPair) {
     disableCards(firstCard, secondCard);
     memoryGame.resetPickedCards();
+    canPlay = true;
 
     if (memoryGame.checkIsFinished()) {
       endGame();
@@ -91,12 +96,13 @@ function unflipCards(firstCard, secondCard) {
   setTimeout(() => {
     firstCard.classList.remove('turned');
     secondCard.classList.remove('turned');
+    canPlay = true;
   }, 1000);
 }
 
 function disableCards(firstCard, secondCard) {
-  firstCard.removeEventListener('click', flipCard);
-  secondCard.removeEventListener('click', flipCard);
+  firstCard.removeEventListener('click', handleCardClick);
+  secondCard.removeEventListener('click', handleCardClick);
 }
 
 function endGame() {
